@@ -1,8 +1,10 @@
 # Quest BSR Twitch Bot
 This bot will automatically download custom songs requested by viewers on twitch chat to `songs` folder, then you as the streamer can upload all the downloaded songs manually via BMBF.
 
+You can see this bot in action when I'm live at https://www.twitch.tv/wiuwwiuw (please do follow if you like the content :) )
+
 ## Background
-This is intended for twitch streamer who streams Oculus Quest version of Beat Saber, I made this because I need a solution for song request via bsr command even though the current Beat Saber Oculus Quest mod doesn't have runtime song loader yet. So the approach is to at least have an ability to retrieve chat request and download it automatically to my PC, then I can upload all the downloaded songs in one go instead of downloading it manually one by one (which the viewer will wait for you to download and upload it to the Quest).
+This is intended for twitch streamer who streams Oculus Quest version of Beat Saber, I made this because I need a solution for song request via bsr command even though the current Beat Saber Oculus Quest mod doesn't have runtime song loader yet. So the approach is to at least have an ability to retrieve chat request and download it automatically to my PC, then I can upload all the downloaded songs in one go instead of downloading it manually one by one (in which the viewer will wait for you to download and upload it to the Quest).
 
 If you are using PC version of Beat Saber, it's recommended to use "Song Request Manager" mod instead that can be installed via [ModAssistant](https://github.com/Assistant/ModAssistant), it's better and easier to set up.
 
