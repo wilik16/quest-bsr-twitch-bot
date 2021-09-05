@@ -55,7 +55,6 @@ function fetchMapInfo(mapId, username, channel) {
         .then(info => {
             const versions = info.versions[0]
             const downloadUrl = versions.downloadURL;
-            console.log(downloadUrl) 
             const fileName = sanitize(`${info.key} ${username} ${info.metadata.levelAuthorName} (${info.name}).zip`);
             const message = `@${username} requested "${info.metadata.songAuthorName}" - "${info.name}" by "${info.metadata.levelAuthorName}" (${info.key}). Successfully added to the queue.`;
             download(downloadUrl, fileName, message, channel);
@@ -64,12 +63,9 @@ function fetchMapInfo(mapId, username, channel) {
 }
 
 async function download(url, fileName, message, channel) {
-    console.log("downloading")
     const res = await fetch(url, { headers: { 'User-Agent': USER_AGENT } });
-    console.log(res)
 
     await new Promise((resolve, reject) => {
-        console.log("awaiting promise")
         const fileStream = fs.createWriteStream(`${fileName}`);
             const request = http.get(`${url}`, function(response) {
               response.pipe(fileStream);
