@@ -27,4 +27,5 @@ Try to send a bsr command chat in your `CHANNEL_NAME` chat (for example `!bsr bd
 
 ## Contributing
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change. If you want to give feedback only, let me know by opening an issue too.
+
 Updated to the new beatsaver api by joshcubes
