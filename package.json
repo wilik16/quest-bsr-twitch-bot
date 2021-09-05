@@ -4,11 +4,11 @@
   "description": "Implementation of automatic Beat Saber custom song download requested by viewer from twitch chat. github.com/wilik16/quest-bsr-twitch-bot",
   "main": "bot.js",
   "dependencies": {
+    "https": "^1.0.0",
     "node-fetch": "^2.6.1",
     "sanitize-filename": "^1.6.3",
     "tmi.js": "^1.5.0"
   },
-  "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
