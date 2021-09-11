@@ -57,12 +57,13 @@ function fetchMapInfo(mapId, username, channel) {
 }
 
 async function download(url, fileName, message, channel) {
-    const res = await fetch(url, { headers: { 'User-Agent': config.user_agent } });
-
     await new Promise((resolve, reject) => {
+        if (!fs.existsSync("maps")){
+            fs.mkdirSync("maps");
+        }
         const fileStream = fs.createWriteStream(`maps/${fileName}`);
-            const request = http.get(`${url}`, function(response) {
-              response.pipe(fileStream);
+            http.get(`${url}`, function(response) {
+                response.pipe(fileStream);
             });
         fileStream.on("finish", function() {
             console.log(`* Downloaded "${fileName}"`);
