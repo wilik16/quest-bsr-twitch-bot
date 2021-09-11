@@ -44,7 +44,7 @@ function getIpAddress() {
 
 function adbConnect(ipAddress) {
     console.log(`- Connecting to Quest wirelessly...`)
-    exec(`${adb} tcpip 5555 && adb connect ${ipAddress}:5555`, (error, stdout, stderr) => {
+    exec(`${adb} tcpip 5555 && ${adb} connect ${ipAddress}:5555`, (error, stdout, stderr) => {
         if (error) {
             console.log(`- [CO]error: ${error.message}`);
             return;
