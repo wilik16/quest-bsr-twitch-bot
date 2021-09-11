@@ -4,6 +4,7 @@
   "description": "Implementation of automatic Beat Saber custom song download requested by viewer from twitch chat. github.com/wilik16/quest-bsr-twitch-bot",
   "main": "bot.js",
   "dependencies": {
+    "dotenv": "^10.0.0",
     "https": "^1.0.0",
     "node-fetch": "^2.6.1",
     "sanitize-filename": "^1.6.3",

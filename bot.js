@@ -3,18 +3,12 @@ const fetch = require('node-fetch');
 const fs = require(`fs`);
 const sanitize = require(`sanitize-filename`);
 const http = require('https');
+const config = require('./config');
 
-const USER_AGENT = `YOUR_USER_AGENT/1.0.0`; // define your own User-Agent https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/User-Agent
-const BSR_MESSAGE = `To request song, find a song at bsaber.com and click on twitch logo under a song to copy the code, then paste in the chat. I made a video guide here https://imgur.com/a/a0s0qqa`;
-const BOT_OPTIONS = {
-    identity: {
-        username: "Your Bot Username",
-        password: "Your Bot Oauth Token"
-    },
-    channels: ["Your Channel"]
-}; // follow this docs on how to retrieve these 3 variables https://dev.twitch.tv/docs/irc
-
-const client = new tmi.client(BOT_OPTIONS);
+const client = new tmi.client({
+    identity: { username: config.bot_options.username, password: config.bot_options.password },
+    channels: [config.bot_options.channel]
+});
 client.on('connected', onConnectedHandler);
 client.on('message', onMessageHandler);
 client.connect();
@@ -42,7 +36,7 @@ function processBsr(message, username, channel) {
     if (message.charAt(command.length) == ` ` && arg.length > 0) {
         fetchMapInfo(arg, username, channel);
     } else {
-        client.say(channel, BSR_MESSAGE);
+        client.say(channel, config.message.manual);
     }
     return true;
 }
@@ -50,23 +44,23 @@ function processBsr(message, username, channel) {
 function fetchMapInfo(mapId, username, channel) {
     const url = `https://api.beatsaver.com/maps/id/${mapId}`;
 
-    fetch(url, { method: "GET", headers: { 'User-Agent': USER_AGENT }})
+    fetch(url, { method: "GET", headers: { 'User-Agent': config.user_agent }})
         .then(res => res.json())
         .then(info => {
             const versions = info.versions[0]
             const downloadUrl = versions.downloadURL;
-            const fileName = sanitize(`${info.key} ${username} ${info.metadata.levelAuthorName} (${info.name}).zip`);
-            const message = `@${username} requested "${info.metadata.songAuthorName}" - "${info.name}" by "${info.metadata.levelAuthorName}" (${info.key}). Successfully added to the queue.`;
+            const fileName = sanitize(`${info.id} ${username} ${info.metadata.levelAuthorName} (${info.name}).zip`);
+            const message = `@${username} requested "${info.metadata.songAuthorName}" - "${info.name}" by "${info.metadata.levelAuthorName}" (${info.id}). Successfully added to the queue.`;
             download(downloadUrl, fileName, message, channel);
         })
         .catch(err => console.log(err));
 }
 
 async function download(url, fileName, message, channel) {
-    const res = await fetch(url, { headers: { 'User-Agent': USER_AGENT } });
+    const res = await fetch(url, { headers: { 'User-Agent': config.user_agent } });
 
     await new Promise((resolve, reject) => {
-        const fileStream = fs.createWriteStream(`${fileName}`);
+        const fileStream = fs.createWriteStream(`maps/${fileName}`);
             const request = http.get(`${url}`, function(response) {
               response.pipe(fileStream);
             });
