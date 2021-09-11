@@ -5,6 +5,7 @@
   "main": "bot.js",
   "dependencies": {
     "dotenv": "^10.0.0",
+    "extract-zip": "^2.0.1",
     "https": "^1.0.0",
     "node-fetch": "^2.6.1",
     "sanitize-filename": "^1.6.3",

@@ -9,7 +9,9 @@ const config = {
         username: process.env.BOT_USERNAME,
         password: process.env.OAUTH_TOKEN,
         channel: process.env.CHANNEL_NAME
-    }
+    },
+    enable_automatic_upload_to_quest: false, // true or false
+    adb_folder: `%appdata%\\SideQuest\\platform-tools` // shouldn't need to be changed if using Windows and SideQuest is installed
 };
 
 module.exports = config;
