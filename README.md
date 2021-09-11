@@ -1,5 +1,5 @@
 # Quest BSR Twitch Bot
-This bot will automatically download custom songs requested by viewers on twitch chat to `maps` folder, then you as the streamer can upload all the downloaded songs manually via BMBF.
+Quest BSR Twitch Bot is an Oculus Quest Beat Saber song request bot that will download requested songs and optionally upload to the Quest automatically. If you choose to enable automatic upload feature, you will be able to play requested songs without leaving Beat Saber and opening BMBF.
 
 You can see this bot in action when I'm live at https://www.twitch.tv/wiuwwiuw (please do follow if you like the content :) )
 
