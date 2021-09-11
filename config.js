@@ -9,7 +9,8 @@ const config = {
         username: process.env.BOT_USERNAME,
         password: process.env.OAUTH_TOKEN,
         channel: process.env.CHANNEL_NAME
-    }
+    },
+    adb_folder: `%appdata%\\SideQuest\\platform-tools`
 };
 
 module.exports = config;

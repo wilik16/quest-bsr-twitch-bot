@@ -3,15 +3,59 @@ const fetch = require('node-fetch');
 const fs = require(`fs`);
 const sanitize = require(`sanitize-filename`);
 const http = require('https');
+const { exec } = require("child_process");
 const config = require('./config');
 
-const client = new tmi.client({
-    identity: { username: config.bot_options.username, password: config.bot_options.password },
-    channels: [config.bot_options.channel]
-});
-client.on('connected', onConnectedHandler);
-client.on('message', onMessageHandler);
-client.connect();
+var questConnected = false;
+var questIpAddress = ``;
+
+getIpAddress()
+function getIpAddress() {
+    console.log(`Getting Quest IP Address...(make sure the Quest is connected via cable)`);
+    exec(`${config.adb_folder}/adb shell ip addr show wlan0`, (error, stdout, stderr) => {
+        if (error) {
+            console.log(`error: ${error.message}`);
+            return;
+        }
+        if (stderr) {
+            console.log(`stderr: ${stderr}`);
+            return;
+        }
+        const r = /\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b/;
+        const ipAddress = stdout.match(r);
+        console.log(`Quest IP Address: ${ipAddress}`);
+        adbConnect(ipAddress);
+    });
+}
+
+function adbConnect(ipAddress) {
+    console.log(`Connecting to Quest wirelessly...`)
+    exec(`adb tcpip 5555 && adb connect ${ipAddress}:5555`, (error, stdout, stderr) => {
+        if (error) {
+            console.log(`error: ${error.message}`);
+            return;
+        }
+        if (stderr) {
+            console.log(`stderr: ${stderr}`);
+            return;
+        }
+        console.log(`output: ${stdout}`);
+        if (stdout.includes('connected to')) {
+            questConnected = true;
+            questIpAddress = ipAddress;
+            console.log(`Quest connected wirelessly, now you can unplug the cable if you want`)
+        }
+    });
+}
+
+//TODO: uncomment this before release
+// const client = new tmi.client({
+//     identity: { username: config.bot_options.username, password: config.bot_options.password },
+//     channels: [config.bot_options.channel]
+// });
+// client.on('connected', onConnectedHandler);
+// client.on('message', onMessageHandler);
+// client.connect();
 
 function onConnectedHandler(addr, port) {
     console.log(`* Connected to ${addr}:${port}`);
