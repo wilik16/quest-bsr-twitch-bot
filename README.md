@@ -11,6 +11,10 @@ This is intended for twitch streamer who streams Oculus Quest version of Beat Sa
 If you are using PC version of Beat Saber, it's recommended to use "Song Request Manager" mod instead that can be installed via [ModAssistant](https://github.com/Assistant/ModAssistant), it's better and easier to set up.
 
 ## Installation
+Installation tutorial video by [Universe-made-of-cotton](https://www.youtube.com/channel/UCpXfUhQUr3VHSXbV-BNBlxA/)
+
+[![VIDEO](http://img.youtube.com/vi/UjLeEJEUfuo/0.jpg)](http://www.youtube.com/watch?v=UjLeEJEUfuo "Quest BSR Twitch Bot Setup")
+
 - Clone or download this repo (Code -> Download ZIP, then extract)
 - Create new file named `.env` with this content below, then follow [this docs](https://dev.twitch.tv/docs/irc) on how to retrieve these 3 variables
 ```env
