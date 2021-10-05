@@ -11,6 +11,7 @@ const config = {
         channel: process.env.CHANNEL_NAME
     },
     enable_automatic_upload_to_quest: false, // true or false
+    multiple_account_mode: false, // true or false
     adb_folder: `%appdata%\\SideQuest\\platform-tools` // shouldn't need to be changed if using Windows and SideQuest is installed
 };
 

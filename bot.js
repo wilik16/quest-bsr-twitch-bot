@@ -11,6 +11,7 @@ const config = require('./config');
 const adb = `${config.adb_folder}/adb`;
 var questConnected = false;
 var questIpAddress = ``;
+var questUserId = `0`;
 
 const client = new tmi.client({
     identity: { username: config.bot_options.username, password: config.bot_options.password },
@@ -53,28 +54,64 @@ function adbConnect(ipAddress) {
             console.log(`- [CO]stderr: ${stderr}`);
             return;
         }
-        console.log(`- [CO]output: ${stdout}`);
+        console.log(`- [CO]output: ${stdout.trim()}`);
         if (stdout.includes('connected to')) {
             questConnected = true;
             questIpAddress = ipAddress;
-            console.log(`- Quest connected wirelessly, now you can unplug the cable if you want`)
+            console.log(`* Quest connected wirelessly, now you can unplug the cable if you want`);
+            if (config.multiple_account_mode) {
+                getQuestUserId();
+            }
         }
     });
 }
 
+function getQuestUserId() {
+    console.log(`- Getting current user's id...`)
+    exec(`${adb} -s ${questIpAddress}:5555 shell am get-current-user`, (error, stdout, stderr) => {
+        if (error) {
+            console.log(`- [AM]error: ${error.message}`);
+            return;
+        }
+        if (stderr) {
+            console.log(`- [AM]stderr: ${stderr}`);
+            return;
+        }
+        // console.log(`- [AM]output: ${stdout.trim()}`);
+        questUserId = stdout.trim();
+        installTradefedContentProvider();
+    });
+}
+
+function installTradefedContentProvider() {
+    console.log(`- Installing TradefedContentProvider.apk...`);
+    exec(`${adb} -s ${questIpAddress}:5555 install --user ${questUserId} -g TradefedContentProvider.apk`, (error, stdout, stderr) => {
+        if (error) {
+            console.log(`- [IN]error: ${error.message}`);
+            return;
+        }
+        if (stderr) {
+            console.log(`- [IN]stderr: ${stderr}`);
+            return;
+        }
+        // console.log(`- [IN]output: ${stdout}`);
+        console.log(`* Success, the bot can now accept !bsr request`);
+    });
+}
+
 function onConnectedHandler(addr, port) {
-    console.log(`* Connected to ${addr}:${port}`);
+    console.log(`* Connected to twitch chat at ${addr}:${port}`);
 }
 
 function onMessageHandler(channel, tags, rawMessage, self) {
     if (self || rawMessage.charAt(0) != '!') { return; }
 
-    console.log(`======\n* Received "${rawMessage}"`);
+    console.log(`======\n> Received "${rawMessage}"`);
     const message = rawMessage.trim();
     const username = tags.username;
 
     if (processBsr(message, username, channel)) { 
-    } else { console.log(`* This command is not handled`); }
+    } else { console.log(`> This command is not handled`); }
 }
 
 function processBsr(message, username, channel) {
@@ -93,7 +130,7 @@ function processBsr(message, username, channel) {
 function fetchMapInfo(mapId, username, channel) {
     const url = `https://api.beatsaver.com/maps/id/${mapId}`;
 
-    console.log(`* Getting map info...`);
+    console.log(`> Getting map info...`);
     fetch(url, { method: "GET", headers: { 'User-Agent': config.user_agent }})
         .then(res => res.json())
         .then(info => {
@@ -108,7 +145,7 @@ function fetchMapInfo(mapId, username, channel) {
 
 async function download(url, fileName, hash, message, channel) {
     await new Promise((resolve, reject) => {
-        console.log(`* Downloading map...`);
+        console.log(`> Downloading map...`);
         const mapsFolder = `maps`;
         if (!fs.existsSync(mapsFolder)){
             fs.mkdirSync(mapsFolder);
@@ -119,7 +156,7 @@ async function download(url, fileName, hash, message, channel) {
                 response.pipe(fileStream);
             });
         fileStream.on("finish", function() {
-            console.log(`* Downloaded "${fileName}"`);
+            console.log(`> Downloaded "${fileName}"`);
             client.say(channel, message);
             if (questConnected) {
                 extractZip(hash, filePath);
@@ -132,9 +169,13 @@ async function download(url, fileName, hash, message, channel) {
 async function extractZip(hash, source) {
     try {
         await extract(source, { dir: resolve(`tmp/${hash}`) });
-        pushMapToQuest(hash);
+        if (config.multiple_account_mode) {
+            pushMapToQuestMulti(hash);
+        } else {
+            pushMapToQuest(hash);
+        }
     } catch (err) {
-        console.log("* Oops: extractZip failed", err);
+        console.log("- Oops: extractZip failed", err);
     }
 }
 
@@ -157,4 +198,28 @@ function pushMapToQuest(hash) {
             }
         });
     });
+}
+
+function pushMapToQuestMulti(hash) {
+    console.log(`> Uploading to Quest...`)
+    const songFolder = `tmp/${hash}`;
+    const dir = fs.opendirSync(songFolder)
+    let dirent
+    while ((dirent = dir.readSync()) !== null) {
+        exec(`${adb} -s ${questIpAddress}:5555 shell content write --user ${questUserId} --uri content://android.tradefed.contentprovider/sdcard/ModData/com.beatgames.beatsaber/Mods/SongLoader/CustomLevels/${hash}/${dirent.name} < ${songFolder}/${dirent.name}`, (error, stdout, stderr) => {
+            /*
+            if (error) {
+                console.log(`- [SH]error: ${error.message}`);
+                return;
+            }
+            if (stderr) {
+                console.log(`- [SH]stderr: ${stderr}`);
+                return;
+            }
+            console.log(`- [SH]output: ${dirent.name} pushed`);
+            */
+        });
+    }
+    dir.closeSync();
+    console.log(`> Map uploaded to Quest`);
 }
